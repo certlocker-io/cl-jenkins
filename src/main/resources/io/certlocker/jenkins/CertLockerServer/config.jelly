@@ -1,8 +1,20 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
-  <f:entry title="Name" field="name"><f:textbox/></f:entry>
-  <f:entry title="CertLocker base URL (HTTPS)" field="url"><f:textbox/></f:entry>
-  <f:entry title="OpenID Connect id token credential ID" field="credentialsId"><f:textbox/></f:entry>
-  <f:entry title="Default Trust account ID (optional)" field="account"><f:textbox/></f:entry>
+  <f:entry title="Name" field="name" help=""
+           description="Use this name in your Pipeline's server parameter, for example local-trust. Use letters, digits, dot, dash or underscore; spaces are not allowed.">
+    <f:textbox/>
+  </f:entry>
+  <f:entry title="CertLocker base URL (HTTPS)" field="url" help=""
+           description="Trust Gateway HTTPS base URL, including /gateway when applicable. Do not append /rest/api/v1. The controller JVM must trust its TLS certificate; a local HTTP server needs an HTTPS reverse proxy.">
+    <f:textbox/>
+  </f:entry>
+  <f:entry title="OpenID Connect id token credential ID" field="credentialsId" help=""
+           description="Create an OpenID Connect id token (string) credential under Manage Jenkins → Credentials, then enter its ID here, for example certlocker-build-identity. Its audience must match the Trust principal. Secret text credentials are not supported.">
+    <f:textbox/>
+  </f:entry>
+  <f:entry title="Default Trust account ID (optional)" field="account" help=""
+           description="The ID of the Trust account owning the secrets, not its display name. Leave blank only when each withCertLockerSecrets call supplies account explicitly.">
+    <f:textbox/>
+  </f:entry>
   <f:repeatableDeleteButton/>
 </j:jelly>

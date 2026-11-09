@@ -3,9 +3,12 @@ package io.certlocker.jenkins;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
+import hudson.util.FormValidation;
 import java.net.URI;
+import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
 
 /** Administrator-owned destination and OIDC credential selection. */
 public final class CertLockerServer extends AbstractDescribableImpl<CertLockerServer> {
@@ -72,6 +75,44 @@ public final class CertLockerServer extends AbstractDescribableImpl<CertLockerSe
 
     @Extension
     public static final class DescriptorImpl extends Descriptor<CertLockerServer> {
+        public FormValidation doCheckName(@QueryParameter String value) {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+            if (value == null || !value.matches("[A-Za-z0-9_.-]+")) {
+                return FormValidation.error(
+                        "Use letters, digits, dot, dash or underscore, for example local-trust. Spaces are not allowed.");
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckUrl(@QueryParameter String value) {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+            try {
+                endpoint(value);
+                return FormValidation.ok();
+            } catch (IllegalArgumentException e) {
+                return FormValidation.error(e.getMessage());
+            }
+        }
+
+        public FormValidation doCheckCredentialsId(@QueryParameter String value) {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+            return value == null || value.isBlank()
+                    ? FormValidation.error("Enter the ID of an OpenID Connect id token (string) credential.")
+                    : FormValidation.ok();
+        }
+
+        public FormValidation doCheckAccount(@QueryParameter String value) {
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+            try {
+                if (value != null && !value.isBlank()) {
+                    SecretBinding.pathId(value);
+                }
+                return FormValidation.ok();
+            } catch (IllegalArgumentException e) {
+                return FormValidation.error("Enter a Trust account ID, not its display name or a URL.");
+            }
+        }
+
         @Override
         public String getDisplayName() {
             return "CertLocker server";

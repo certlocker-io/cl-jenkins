@@ -196,6 +196,11 @@ Open **Manage Jenkins → System → CertLocker**, add a server and fill in:
 Save the configuration. Server names must be unique. You can configure several profiles
 for different Trust instances, accounts or workload identities.
 
+Use a Pipeline-friendly name such as `local-trust`: names accept letters, digits, dot,
+dash and underscore, with no spaces. Setup instructions appear directly beside each field;
+they do not require loading a separate help page. Invalid field values are reported before
+you save.
+
 Only Jenkins administrators can change destination profiles. Pipeline authors choose a
 profile name, rather than supplying a URL or a different credential. Account overrides
 remain subject to the Trust token's account and access permissions.
