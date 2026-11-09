@@ -42,3 +42,20 @@ information. Keep images small and add descriptive alternative text when linking
 Do not add placeholder images or links for screenshots that are not yet available.
 
 Report security issues privately using the [security policy](SECURITY.md).
+
+## Releases
+
+Push a version tag matching the POM version, for example `v0.2.0` for
+`0.2.0-SNAPSHOT`. The workflow builds and verifies a non-SNAPSHOT HPI, checks its
+embedded version, then creates a GitHub Release containing `certlocker.hpi` and
+`certlocker.hpi.sha256`. A tag such as `v0.2.0-rc.1` creates a prerelease.
+Publishing a release through GitHub's interface also runs the same build and attaches
+the assets. Branch builds on `dev` and `main` keep downloadable CI artifacts.
+
+```sh
+git tag -a v0.2.0 -m "CertLocker Jenkins Plugin 0.2.0"
+git push origin v0.2.0
+```
+
+Use a new version tag for code changes; do not move a published tag. Bump the POM to
+the next development version before preparing the next release.

@@ -2,8 +2,11 @@ name: Build
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
+    tags: ['v*']
   pull_request:
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -11,7 +14,7 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
 jobs:
   verify:
@@ -28,12 +31,75 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
+      - name: Check release tooling
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
+      - name: Prepare release version
+        if: github.ref_type == 'tag'
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python3 scripts/prepare_release.py "$RELEASE_TAG"
       - name: Build and verify
         run: ./mvnw -B -ntp clean verify
+      - name: Check release plugin version
+        if: github.ref_type == 'tag'
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import zipfile
+          with zipfile.ZipFile('target/certlocker.hpi') as archive:
+              manifest = archive.read('META-INF/MANIFEST.MF').decode()
+          version = next(line.split(': ', 1)[1] for line in manifest.splitlines()
+                         if line.startswith('Plugin-Version: '))
+          expected = os.environ['RELEASE_TAG'].removeprefix('v')
+          if version != expected:
+              raise SystemExit(f'Plugin version {version!r} does not match release {expected!r}')
+          PY
+      - name: Generate checksum
+        working-directory: target
+        run: sha256sum certlocker.hpi > certlocker.hpi.sha256
       - name: Upload plugin
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: certlocker-hpi
-          path: target/certlocker.hpi
+          path: |
+            target/certlocker.hpi
+            target/certlocker.hpi.sha256
           if-no-files-found: error
           retention-days: 14
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Download verified plugin
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: certlocker-hpi
+          path: release
+      - name: Verify checksum
+        working-directory: release
+        run: sha256sum --check certlocker.hpi.sha256
+      - name: Publish GitHub release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release/certlocker.hpi release/certlocker.hpi.sha256 --clobber
+          else
+            release_flags=()
+            if [[ "$RELEASE_TAG" == *-rc.* ]]; then
+              release_flags+=(--prerelease)
+            fi
+            gh release create "$RELEASE_TAG" release/certlocker.hpi release/certlocker.hpi.sha256 \
+              --verify-tag --generate-notes --title "CertLocker Jenkins Plugin ${RELEASE_TAG#v}" \
+              "${release_flags[@]}"
+          fi

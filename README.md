@@ -57,6 +57,12 @@ Pipeline plugin; it does not provide a Freestyle build wrapper.
 
 ## Build and install
 
+Download `certlocker.hpi` from [GitHub Releases](https://github.com/certlocker-io/cl-jenkins/releases).
+Each release includes `certlocker.hpi.sha256` for checksum verification. Release builds run
+the full test suite and package the version named by the release tag.
+
+To build from source instead:
+
 Select Java 21, then run:
 
 ```sh

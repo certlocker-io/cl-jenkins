@@ -38,9 +38,17 @@ Replace them with your deployment's values. If your Gateway is served under a co
 include that path in its base URL, for example `https://trust.example.com/gateway`.
 Do not add `/rest/api/v1` to the base URL; the plugin adds the API path.
 
-## 2. Build and install the HPI
+## 2. Download or build and install the HPI
 
-With Java 21 selected, run from the repository root:
+Download `certlocker.hpi` and `certlocker.hpi.sha256` from
+[GitHub Releases](https://github.com/certlocker-io/cl-jenkins/releases).
+With both files in the same directory, verify the download:
+
+```sh
+sha256sum --check certlocker.hpi.sha256
+```
+
+To build from source, select Java 21 and run from the repository root:
 
 ```sh
 ./mvnw -B clean verify

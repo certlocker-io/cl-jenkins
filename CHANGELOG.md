@@ -1,6 +1,6 @@
 # Changes
 
-## 0.2.0-SNAPSHOT
+## 0.2.0
 
 - Add `withCertLockerSecrets` with multiple named bindings and automatic build OIDC authentication.
 - Support all current Trust secret payloads: PASSWORD, CREDENTIALS, CONFIGURATION, PEM and PRIVATE_KEY.
@@ -13,6 +13,8 @@
 - Keep `withCertLockerOIDC` for direct Trust API access and all its existing token types.
 - Add examples and Jenkins tests covering all secret types, exact bytes, masking, parallel scopes,
   cancellation, restart, a remoting agent, negative responses and runnable generated snippets.
+- Show server setup instructions inline and validate configuration fields before saving.
+- Publish verified, versioned HPI downloads and SHA-256 checksums through GitHub Releases.
 
 ## 0.1.0-SNAPSHOT
 
