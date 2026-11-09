@@ -1,0 +1,26 @@
+# Build output and local development controller
+/target/
+/work/
+/jenkins-home/
+*.hpi
+*.jpi
+
+# IDE and operating system files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Local configuration and credentials
+.env
+.env.*
+*.local
+*.log
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+/settings.xml

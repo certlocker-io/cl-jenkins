@@ -1,0 +1,21 @@
+// Replace profile and secret IDs with those configured in Jenkins and Trust.
+pipeline {
+    agent any
+    stages {
+        stage('Deploy with Trust secrets') {
+            steps {
+                withCertLockerSecrets(server: 'production', secrets: [
+                    [secretId: 'database-credentials-id', field: 'username', variable: 'DB_USER'],
+                    [secretId: 'database-credentials-id', field: 'password', variable: 'DB_PASSWORD'],
+                    [secretId: 'deployment-token-id', variable: 'DEPLOY_TOKEN'],
+                    [secretId: 'ssh-key-id', field: 'key', mode: 'FILE', fileName: 'deploy.pem', variable: 'SSH_KEY'],
+                    [secretId: 'configuration-id', mode: 'FILE', fileName: 'app.yaml', variable: 'APP_CONFIG']
+                ]) {
+                    // Your script reads the variables and file paths above.
+                    // Do not echo the values or copy the files into artifacts.
+                    sh './deploy.sh'
+                }
+            }
+        }
+    }
+}

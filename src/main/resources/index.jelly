@@ -1,0 +1,3 @@
+<?jelly escape-by-default='true'?>
+<div>Use Trust secrets, credentials, configuration, PEMs and private keys in Jenkins Pipeline.
+Build OIDC authentication, masked environment bindings and private temporary files.</div>

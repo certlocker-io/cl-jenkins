@@ -1,0 +1,10 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+ <f:entry title="Trust secret ID" field="secretId"><f:textbox/></f:entry>
+ <f:entry title="Environment variable" field="variable"><f:textbox/></f:entry>
+ <f:entry title="Bind as" field="mode"><f:select/></f:entry>
+ <f:entry title="JSON field or pointer (optional)" field="field"><f:textbox/></f:entry>
+ <f:entry title="File name (FILE mode only)" field="fileName"><f:textbox/></f:entry>
+ <f:entry title="Decode Base64" field="base64"><f:checkbox/></f:entry>
+ <f:repeatableDeleteButton/>
+</j:jelly>
